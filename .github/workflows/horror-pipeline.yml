@@ -1,0 +1,68 @@
+name: 2D Hindi Horror Video Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      story_json:
+        description: 'AI-generated story JSON from the n8n workflow'
+        required: true
+        type: string
+      chat_id:
+        description: 'Telegram chat ID to notify when upload finishes'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: horror-video-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  render-and-upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install FFmpeg and Hindi fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-core fonts-noto-extra
+
+      - name: Install Python packages
+        run: python -m pip install --upgrade pip && pip install -r requirements.txt
+
+      - name: Render video and upload to YouTube
+        env:
+          STORY_JSON: ${{ inputs.story_json }}
+          TELEGRAM_CHAT_ID: ${{ inputs.chat_id }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          YOUTUBE_PRIVACY_STATUS: ${{ vars.YOUTUBE_PRIVACY_STATUS }}
+          YOUTUBE_MADE_FOR_KIDS: ${{ vars.YOUTUBE_MADE_FOR_KIDS }}
+          TTS_VOICE: ${{ vars.TTS_VOICE }}
+        run: python render_and_upload.py
+
+      - name: Notify Telegram if the job failed before the renderer could notify
+        if: failure()
+        env:
+          TELEGRAM_CHAT_ID: ${{ inputs.chat_id }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            curl --silent --show-error --fail \
+              --request POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              --header "Content-Type: application/json" \
+              --data "$(python -c 'import json,os; print(json.dumps({"chat_id":os.environ["TELEGRAM_CHAT_ID"],"text":"❌ Horror automation failed during setup/render. Open the latest GitHub Actions run for the error details."}))')"
+          fi
