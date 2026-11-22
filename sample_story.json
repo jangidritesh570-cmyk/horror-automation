@@ -1,0 +1,17 @@
+{
+  "title": "आधी रात की तीसरी घंटी",
+  "description": "एक छोटे पहाड़ी कस्बे में आधी रात को बंद पड़े टेलीफोन बूथ से हर रात तीन बार घंटी बजती है। जो भी फोन उठाता है, उसे अपने ही भविष्य की आवाज़ सुनाई देती है। क्या यह चेतावनी है या कोई जाल? यह एक काल्पनिक हिंदी 2D हॉरर कहानी है।",
+  "tags": ["hindi horror story", "2d horror animation", "horror kahani", "ghost story hindi", "supernatural mystery", "animated horror"],
+  "hashtags": ["#HindiHorror", "#2DAnimation", "#HorrorStory"],
+  "thumbnail_text": "तीसरी घंटी किसकी थी?",
+  "scenes": [
+    {"visual": "A lonely telephone booth on a foggy mountain road at midnight", "narration": "पहाड़ों के बीच बसे छोटे से कस्बे में एक पुराना टेलीफोन बूथ था। दस साल से उसकी लाइन कटी हुई थी, लेकिन हर रात ठीक बारह बजे उसमें तीन बार घंटी बजती थी। कस्बे के लोग उस रास्ते से गुजरना भी पसंद नहीं करते थे।"},
+    {"visual": "A young night guard walking toward the abandoned telephone booth", "narration": "एक रात पहरेदार नील ने दूर से वही घंटी सुनी। उसने सोचा कि शायद कोई बच्चा शरारत कर रहा है। टॉर्च लेकर वह बूथ तक पहुँचा। काँच पर धुंध जमी थी और अंदर रखा काला फोन अपने आप हिल रहा था।"},
+    {"visual": "Close-up of an old black rotary phone ringing inside a dark booth", "narration": "पहली घंटी के बाद नील पीछे हट गया। दूसरी घंटी पर उसने दरवाज़ा खोला। तीसरी घंटी बजते ही फोन शांत हो गया। रिसीवर उठाते ही दूसरी तरफ से उसी की आवाज़ आई, जो काँपते हुए कह रही थी कि बूथ से तुरंत बाहर निकल जाओ।"},
+    {"visual": "A dark road behind the booth with a shadow approaching through fog", "narration": "नील ने पूछा कि तुम कौन हो। आवाज़ ने कहा, मैं तुम ही हूँ, बस पाँच मिनट आगे का। तभी बूथ के बाहर किसी के कदम सुनाई दिए। नील ने शीशे में देखा, सड़क पर उसकी ही वर्दी पहने कोई दूसरा आदमी खड़ा था।"},
+    {"visual": "The guard staring at his own reflection in a cracked phone booth window", "narration": "उसने रिसीवर रखकर भागना चाहा, लेकिन बूथ का दरवाज़ा नहीं खुला। फोन फिर बजा। इस बार आवाज़ बोली, अगर बाहर खड़े आदमी को अंदर आने दिया, तो सुबह तुम्हारी जगह वही पहरा देगा। नील ने टॉर्च बंद कर दी।"},
+    {"visual": "An empty foggy road and a phone booth glowing faintly in the night", "narration": "बाहर खड़ा दूसरा नील धीरे-धीरे मुस्कुराया। उसने शीशे पर उँगली से तीन बार दस्तक दी। फोन की घंटी भी तीन बार बजी। नील ने आँखें बंद कीं और रिसीवर को ज़ोर से नीचे पटक दिया। अचानक सारी आवाज़ें बंद हो गईं।"},
+    {"visual": "A quiet mountain town at dawn with the old booth standing empty", "narration": "सुबह कस्बे वालों को बूथ खाली मिला। नील की टॉर्च और टोपी वहीं पड़ी थीं, मगर नील कहीं नहीं था। पुलिस ने फोन की लाइन जाँची तो पता चला कि वह कभी जुड़ी ही नहीं थी। बूथ के अंदर धूल पर ताज़े पैरों के निशान थे।"},
+    {"visual": "A lonely telephone booth at midnight, a phone receiver slowly lifting by itself", "narration": "उस रात फिर बारह बजे तीन घंटियाँ बजीं। इस बार फोन उठाने वाला कोई नहीं था। फिर भी रिसीवर अपने आप उठा और अंदर से नील की आवाज़ आई, अगर कोई मेरी बात सुन रहा है, तो बूथ के बाहर मत देखना। क्योंकि अब मैं बाहर खड़ा हूँ।"}
+  ]
+}

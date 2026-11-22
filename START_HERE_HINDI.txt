@@ -1,0 +1,42 @@
+HORROR AUTOMATION — START HERE (Hindi)
+=====================================
+
+Is ZIP mein poora starter project hai. ZIP ko extract karne ke baad folder ke andar ki files GitHub repository ke ROOT mein upload karni hain.
+
+SABSE IMPORTANT:
+- `README.md`, `render_and_upload.py`, `authorize_youtube.py`, `requirements.txt`, `requirements-auth.txt`, `sample_story.json`, `.gitignore`, `n8n_telegram_horror_workflow.json`, aur `START_HERE_HINDI.txt` repository ke top level par hon.
+- `.github` folder ko bhi usi top level par upload karna hai.
+- `.github` ke andar `workflows` folder aur uske andar `horror-pipeline.yml` hona chahiye.
+- `workflows` naam ka extra folder bana kar uske andar `.github` mat rakhein.
+- ZIP file khud GitHub par upload na karein; ZIP extract karke uske CONTENTS upload karein.
+
+EXPECTED GITHUB STRUCTURE:
+
+horror-automation/
+  .github/
+    workflows/
+      horror-pipeline.yml
+  .gitignore
+  README.md
+  START_HERE_HINDI.txt
+  authorize_youtube.py
+  n8n_telegram_horror_workflow.json
+  render_and_upload.py
+  requirements-auth.txt
+  requirements.txt
+  sample_story.json
+
+UPLOAD STEPS:
+1. GitHub par apni horror-automation repository ka main page kholein.
+2. Add file > Upload files select karein.
+3. Extract kiye hue folder ke andar ki sab files aur `.github` folder select karke drag/drop karein.
+4. Commit changes karein.
+5. Repository ke main page par expected structure check karein.
+
+SECURITY:
+- API keys, Telegram bot token, Google OAuth client_secret.json, refresh token, passwords ya GitHub PAT ko source files mein add na karein.
+- Secrets ko sirf GitHub Settings > Secrets and variables > Actions mein save karein.
+- YouTube upload pehle UNLISTED rakhein. Public publishing tabhi enable karein jab sample output check ho jaye.
+
+NEXT:
+README.md ko follow karein. Telegram credentials, Gemini API key, GitHub Actions secret, aur YouTube OAuth alag-alag connect karne honge. Is ZIP ko extract karna akela bot ko live nahi karta.

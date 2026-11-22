@@ -1,0 +1,318 @@
+{
+  "name": "Telegram 2D Hindi Horror Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "tg-trigger-horror-001",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const update = $input.first().json;\nconst message = update.message ?? update.edited_message;\nif (!message?.text || !message?.chat?.id) return [];\nconst text = message.text.trim();\n// SECURITY: after the first setup message, paste your own Telegram chat ID here.\nconst OWNER_CHAT_ID = 'PASTE_YOUR_TELEGRAM_CHAT_ID_HERE';\nconst isOwner = OWNER_CHAT_ID !== 'PASTE_YOUR_TELEGRAM_CHAT_ID_HERE' && String(message.chat.id) === OWNER_CHAT_ID;\nconst match = text.match(/^\\/start(?:@\\w+)?(?:\\s+([\\s\\S]+))?$/i);\nconst topic = (match?.[1] || 'Create a fresh, surprising supernatural mystery with a unique setting').slice(0, 180);\nconst prompt = `You are the head writer for an original Hindi 2D horror animation YouTube channel.\nCreate a completely original fictional supernatural mystery in natural spoken Hindi (Devanagari), suitable for a 4–6 minute narration. Do not copy existing films, stories, internet creepypastas, copyrighted characters, or real incidents. No graphic gore. Keep it suspenseful, emotionally engaging, and give it a memorable twist ending.\nStory seed from the channel owner: ${topic}\nReturn ONLY valid JSON, no markdown fences, with this exact schema:\n{\"title\":\"Hindi title under 90 characters\",\"description\":\"SEO-friendly Hindi description, 2-4 sentences, followed by a short fictional-story note\",\"tags\":[\"10-15 short YouTube tags\"],\"hashtags\":[\"3-5 hashtags without spaces\"],\"thumbnail_text\":\"short Hindi thumbnail phrase, 2-5 words\",\"scenes\":[{\"visual\":\"one concise English visual description of the environment and action for a dark 2D cartoon illustration\",\"narration\":\"Hindi narration for this scene, about 45-70 words, written for a narrator\"}]}\nCreate 8 scenes. Each scene narration must be natural, complete, and move the same story forward. Total narration should be roughly 450-600 Hindi words. Ensure the first scene has a strong hook and the final scene resolves the mystery. Tags should be plain text, not hashtags. JSON strings must escape quotation marks and newlines correctly.`;\nreturn [{ json: { chat_id: String(message.chat.id), isStart: Boolean(match && isOwner), isOwner, topic, prompt } }];"
+      },
+      "id": "parse-command-horror-001",
+      "name": "Parse Telegram Command",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "is-start-command",
+              "leftValue": "={{ $json.isStart }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-start-horror-001",
+      "name": "Is /start?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Parse Telegram Command').first().json.chat_id }}",
+        "text": "👻 Horror story request received!\n\nAI ab original Hindi story, scene breakdown, title, description aur SEO prepare kar raha hai. Video render hone aur YouTube upload complete hone par yahin link aa jayega.\n\n⏳ Rendering mein kuch minutes lag sakte hain.",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disableWebPagePreview": true
+        }
+      },
+      "id": "telegram-start-ack-horror-001",
+      "name": "Telegram - Start Acknowledgement",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        920,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { contents: [{ role: 'user', parts: [{ text: $('Parse Telegram Command').first().json.prompt }] }], generationConfig: { responseMimeType: 'application/json', maxOutputTokens: 8192 } } }}",
+        "options": {
+          "timeout": 120000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "gemini-story-horror-001",
+      "name": "Gemini - Story + SEO Generator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1160,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst raw = response.candidates?.[0]?.content?.parts?.map(part => part.text || '').join('').trim();\nif (!raw) throw new Error('Gemini returned no story text. Check the API key, model and free-tier limits.');\nconst cleaned = raw.replace(/^```(?:json)?\\s*/i, '').replace(/\\s*```$/, '');\nlet story;\ntry { story = JSON.parse(cleaned); } catch (error) { throw new Error('Gemini output was not valid JSON: ' + error.message); }\nif (!story.title || !story.description || !Array.isArray(story.scenes) || story.scenes.length < 5 || story.scenes.length > 12) throw new Error('Story JSON is missing required fields or does not contain 5-12 scenes.');\nfor (const [index, scene] of story.scenes.entries()) { if (!scene.narration || String(scene.narration).trim().length < 25) throw new Error('Scene ' + (index + 1) + ' narration is missing or too short.'); }\nif (!Array.isArray(story.tags)) story.tags = [];\nif (!Array.isArray(story.hashtags)) story.hashtags = [];\nconst chat_id = $('Parse Telegram Command').first().json.chat_id;\nreturn [{ json: { title: String(story.title).slice(0, 100), story_json: JSON.stringify(story), chat_id, scene_count: story.scenes.length } }];"
+      },
+      "id": "normalize-story-horror-001",
+      "name": "Validate Story JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1400,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.github.com/repos/jangidritesh570-cmyk/horror-automation/actions/workflows/horror-pipeline.yml/dispatches",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "json",
+        "specifyBody": "json",
+        "jsonBody": "={{ { ref: 'main', inputs: { story_json: $json.story_json, chat_id: $json.chat_id } } }}",
+        "options": {
+          "timeout": 30000,
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "github-dispatch-horror-001",
+      "name": "GitHub - Start Free Render Job",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1640,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Parse Telegram Command').first().json.chat_id }}",
+        "text": "={{ '✅ Story + SEO ready! ' + $('Validate Story JSON').first().json.scene_count + ' scenes render ho rahe hain.\\n\\nTitle: ' + $('Validate Story JSON').first().json.title + '\\n\\nGitHub Actions video render karega aur YouTube upload ke baad final link yahin bhejega.' }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disableWebPagePreview": true
+        }
+      },
+      "id": "telegram-queued-horror-001",
+      "name": "Telegram - Render Queued",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1880,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('Parse Telegram Command').first().json.chat_id }}",
+        "text": "={{ '🔒 Private bot setup / help\\n\\nYour Telegram Chat ID: ' + $('Parse Telegram Command').first().json.chat_id + '\\n\\nSetup: paste this Chat ID into OWNER_CHAT_ID in the Parse Telegram Command Code node, save, and activate the workflow again.\\n\\nOnce configured, send /start. Custom idea: /start sunsaan haveli ka raaz' }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disableWebPagePreview": true
+        }
+      },
+      "id": "telegram-help-horror-001",
+      "name": "Telegram - Help Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        920,
+        430
+      ]
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Parse Telegram Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Telegram Command": {
+      "main": [
+        [
+          {
+            "node": "Is /start?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is /start?": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Start Acknowledgement",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Telegram - Help Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram - Start Acknowledgement": {
+      "main": [
+        [
+          {
+            "node": "Gemini - Story + SEO Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini - Story + SEO Generator": {
+      "main": [
+        [
+          {
+            "node": "Validate Story JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Story JSON": {
+      "main": [
+        [
+          {
+            "node": "GitHub - Start Free Render Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub - Start Free Render Job": {
+      "main": [
+        [
+          {
+            "node": "Telegram - Render Queued",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}
