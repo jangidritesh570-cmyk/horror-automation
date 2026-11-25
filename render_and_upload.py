@@ -265,8 +265,8 @@ def synthesize_scene(text: str, number: int, folder: Path) -> tuple[Path, Path]:
         sys.executable, "-m", "edge_tts",
         "--text", text,
         "--voice", VOICE,
-        "--rate", "-4%",
-        "--pitch", "-7Hz",
+        "--rate=-4%",
+        "--pitch=-7Hz",
         "--write-media", str(audio),
         "--write-subtitles", str(subtitles),
     ])
